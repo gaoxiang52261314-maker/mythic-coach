@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MYTHIC COACH — VALORANT AI 教練</title>
+<style>
+:root{
+  --bg:#070a10;--panel:#0e131c;--panel2:#121925;--line:#202a39;
+  --text:#f3f6fb;--muted:#8d99aa;--cyan:#62e6ff;--purple:#9b7cff;
+  --green:#54e39a;--yellow:#ffd166;--red:#ff6b7a;
+}
+*{box-sizing:border-box} body{margin:0;background:
+radial-gradient(circle at 80% 0%,rgba(98,230,255,.11),transparent 28%),
+radial-gradient(circle at 15% 20%,rgba(155,124,255,.10),transparent 28%),var(--bg);
+color:var(--text);font-family:Inter,system-ui,"Noto Sans TC",sans-serif}
+button{font:inherit}.app{display:flex;min-height:100vh}.side{width:250px;border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh;background:rgba(7,10,16,.86);backdrop-filter:blur(14px)}
+.logo{font-weight:900;letter-spacing:2px;font-size:20px;margin:4px 10px 30px}.logo span{color:var(--cyan)}
+.nav button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--muted);padding:13px 14px;border-radius:12px;margin:4px 0;cursor:pointer}
+.nav button.active,.nav button:hover{background:#151d2a;color:#fff}.nav b{margin-right:10px}
+.profile-mini{position:absolute;bottom:20px;left:16px;right:16px;padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:grid;place-items:center;font-weight:900}
+.row{display:flex;align-items:center;gap:10px}.small{font-size:12px;color:var(--muted)}
+.main{flex:1;padding:30px;max-width:1500px;margin:auto;width:100%}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+h1{font-size:30px;margin:0 0 6px}.sub{color:var(--muted)}.badge{padding:7px 11px;border-radius:99px;background:rgba(84,227,154,.1);color:var(--green);border:1px solid rgba(84,227,154,.25);font-size:12px}
+.grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:16px}.card{background:linear-gradient(180deg,rgba(18,25,37,.96),rgba(12,17,25,.96));border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 14px 45px rgba(0,0,0,.18)}
+.hero{grid-column:span 2;min-height:210px;position:relative;overflow:hidden;background:
+linear-gradient(120deg,rgba(98,230,255,.13),transparent 45%),linear-gradient(180deg,#121b29,#0c111a)}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border:1px solid rgba(98,230,255,.16);border-radius:50%;right:-70px;top:-70px;box-shadow:0 0 0 30px rgba(98,230,255,.025),0 0 0 60px rgba(98,230,255,.018)}
+.kicker{font-size:12px;color:var(--cyan);font-weight:800;letter-spacing:1.5px}.hero h2{font-size:27px;margin:10px 0}.hero p{max-width:650px;color:#b7c1d0;line-height:1.7}.btn{border:0;border-radius:12px;padding:11px 16px;background:linear-gradient(90deg,var(--cyan),#7cc8ff);color:#061018;font-weight:800;cursor:pointer}.btn.alt{background:#192231;color:#dce5f2;border:1px solid var(--line)}
+.stat{font-size:31px;font-weight:900;margin-top:10px}.progress{height:8px;background:#1a2230;border-radius:99px;overflow:hidden;margin:14px 0}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:99px}
+.tag{display:inline-block;font-size:11px;padding:5px 8px;border-radius:8px;background:#192332;color:#b9c7d8;margin:3px}
+.section{margin-top:20px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section h3{margin:0}.muted{color:var(--muted)}
+.task{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.task:last-child{border-bottom:0}.task-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#192231}.task-main{flex:1}.task-title{font-weight:800}.task-meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{font-size:11px;padding:6px 8px;border-radius:8px;background:rgba(155,124,255,.12);color:#c4b6ff}
+.alert{border-left:3px solid var(--yellow);padding:12px 14px;background:rgba(255,209,102,.06);color:#d8d3c4;border-radius:8px;margin-top:14px;font-size:13px}
+.barline{display:flex;align-items:center;gap:10px;margin:13px 0;font-size:12px}.barline span:first-child{width:75px;color:#aeb8c7}.bar{flex:1;height:7px;background:#1a2230;border-radius:9px}.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.view{display:none}.view.active{display:block}.upload{border:1px dashed #3a4b61;border-radius:16px;padding:38px;text-align:center;background:rgba(255,255,255,.015)}.upload input{display:none}
+textarea,input{width:100%;background:#0a0f17;color:#fff;border:1px solid var(--line);border-radius:10px;padding:11px;outline:none}
+.video-list{margin-top:18px}.analysis-box{display:none}.analysis-box.show{display:block}.timeline{height:9px;background:#1a2230;border-radius:9px;position:relative;margin:18px 0}.timeline i{position:absolute;left:18%;width:8%;height:100%;background:var(--red);border-radius:9px}.timeline i:nth-child(2){left:49%;background:var(--yellow);width:5%}.timeline i:nth-child(3){left:74%;background:var(--cyan);width:9%}
+@media(max-width:900px){.side{width:72px}.logo{font-size:0}.logo span{font-size:18px}.nav button{font-size:0;text-align:center}.nav b{font-size:17px;margin:0}.profile-mini{display:none}.main{padding:18px}.grid{grid-template-columns:1fr}.hero{grid-column:auto}}
+
+/* ===== MYTHIC COACH v3 ===== */
+.nav-section{font-size:10px;letter-spacing:1.5px;color:#536173;margin:20px 12px 7px;text-transform:uppercase}
+.top-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{background:#121a27;border:1px solid var(--line);color:#cdd7e4;border-radius:10px;padding:9px 11px;cursor:pointer}
+.hero-v3{grid-column:span 2;min-height:235px}
+.ring{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--cyan) 0 72%,#202b3b 72% 100%);position:relative}
+.ring:after{content:"";position:absolute;inset:9px;background:#0e151f;border-radius:50%}
+.ring strong{position:relative;z-index:1;font-size:25px}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric{padding:14px;border:1px solid var(--line);border-radius:13px;background:#0b111a}
+.metric .num{font-size:23px;font-weight:900;margin-top:5px}
+.delta{font-size:11px;color:var(--green)}
+.coach-card{display:flex;gap:14px;align-items:flex-start;padding:14px;border:1px solid #293547;border-radius:14px;background:linear-gradient(100deg,rgba(98,230,255,.06),rgba(155,124,255,.04))}
+.coach-orb{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#172b3b,#292143);font-size:20px}
+.priority{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.priority:last-child{border-bottom:0}
+.priority-no{width:27px;height:27px;border-radius:8px;background:#192332;display:grid;place-items:center;font-weight:900}
+.priority b{display:block}.priority small{color:var(--muted)}
+.priority-score{margin-left:auto;font-size:11px;color:var(--yellow)}
+.login-panel{max-width:720px;margin:30px auto}
+.riot-box{padding:28px;border:1px solid #2a3749;border-radius:20px;background:radial-gradient(circle at 90% 10%,rgba(255,76,94,.10),transparent 35%),#0d131d}
+.riot-mark{font-weight:1000;font-size:22px;letter-spacing:2px}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
+.flow div{padding:12px;border-radius:11px;background:#111a27;border:1px solid var(--line);font-size:11px;color:#aeb9c9}
+.flow b{display:block;color:#fff;margin-bottom:4px}
+.filter{display:flex;gap:7px;flex-wrap:wrap}.filter button{border:1px solid var(--line);background:#111925;color:#aeb8c7;padding:8px 10px;border-radius:9px;font-size:11px;cursor:pointer}.filter button.on{color:#fff;border-color:#49637f;background:#19283a}
+.video-stat{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.video-stat .metric{min-height:78px}
+.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}.table th{color:#6f7d90;font-weight:600}
+.settings-row{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border:0}.toggle{width:42px;height:23px;border-radius:99px;background:#253246;padding:3px}.toggle i{display:block;width:17px;height:17px;background:#8c9bad;border-radius:50%}.toggle.on{background:#185c6a}.toggle.on i{margin-left:19px;background:var(--cyan)}
+.toast{position:fixed;right:22px;bottom:22px;padding:13px 16px;border:1px solid #314154;border-radius:12px;background:#101824;box-shadow:0 20px 60px #0008;display:none;z-index:99}
+@media(max-width:1050px){.metric-grid,.video-stat{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.hero-v3{grid-column:auto}.flow{grid-template-columns:1fr 1fr}.metric-grid,.video-stat{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="logo">MYTHIC<span>COACH</span></div>
+  <div class="nav">
+    <div class="nav-section">Coach</div>
+    <button class="active" onclick="show('home',this)"><b>⌂</b> Dashboard</button>
+    <button onclick="show('training',this)"><b>⚡</b> 今日訓練</button>
+    <button onclick="show('review',this)"><b>◉</b> AI 影片復盤</button>
+    <div class="nav-section">Player</div>
+    <button onclick="show('stats',this)"><b>◈</b> 個人數據</button>
+    <button onclick="show('history',this)"><b>↗</b> 成長紀錄</button>
+    <button onclick="show('account',this)"><b>◎</b> Riot 帳號</button>
+    <div class="nav-section">System</div>
+    <button onclick="show('settings',this)"><b>⚙</b> 設定</button>
+  </div>
+  <div class="profile-mini"><div class="row"><div class="avatar">GX</div><div><b>GaoXiang</b><div class="small">Ascendant → Mythic</div></div></div></div>
+</aside>
+
+<main class="main">
+<section id="home" class="view active">
+<div class="top">
+  <div><h1>MYTHIC COMMAND CENTER</h1><div class="sub">你的 AI 教練正在根據最近的對戰、訓練與復盤重新計算優先級。</div></div>
+  <div class="top-actions"><button class="icon-btn" onclick="toast('同步完成：訓練資料已更新')">↻ 同步</button><span class="badge">● COACH ONLINE</span></div>
+</div>
+
+<div class="grid">
+  <div class="card hero hero-v3">
+    <div class="row" style="justify-content:space-between">
+      <div><div class="kicker">MYTHIC PROGRESS</div><h2>Ascendant → Mythic</h2>
+      <p>目前最大的瓶頸不是純槍法，而是「預瞄 + 決策」。AI 建議本週先把這兩項修穩，再提高速度訓練。</p>
+      <button class="btn" onclick="show('training',document.querySelectorAll('.nav button')[1])">開始今日訓練 →</button></div>
+      <div class="ring"><strong>72%</strong></div>
+    </div>
+  </div>
+
+  <div class="card"><div class="small">Coach Score</div><div class="stat">72</div><div class="delta">↗ +6 本週</div><div class="progress"><i style="width:72%"></i></div><div class="small">距離目標還有 28%</div></div>
+
+  <div class="card"><div class="small">最近 20 場</div><div class="stat">58%</div><div class="delta">↗ 勝率上升</div><p class="small">平均 K/D 1.21</p></div>
+
+  <div class="card" style="grid-column:span 2"><div class="section-head"><h3>AI 今日判斷</h3><span class="pill">TOP PRIORITY</span></div>
+    <div class="coach-card"><div class="coach-orb">🧠</div><div><b>今天不要追求更快。</b><p class="small" style="line-height:1.7;margin:7px 0">影片與對戰資料都指向同一個問題：你常在交火前才開始找目標。先把準星放對，再讓速度自然出來。</p><span class="tag">預瞄 +30%</span><span class="tag">決策 +20%</span><span class="tag">Flick -10%</span></div></div>
+  </div>
+
+  <div class="card"><h3>本週能力</h3>
+    <div class="barline"><span>第一槍</span><div class="bar"><i style="width:82%"></i></div></div>
+    <div class="barline"><span>預瞄</span><div class="bar"><i style="width:54%"></i></div></div>
+    <div class="barline"><span>決策</span><div class="bar"><i style="width:61%"></i></div></div>
+    <div class="barline"><span>配合</span><div class="bar"><i style="width:58%"></i></div></div>
+  </div>
+
+  <div class="card"><div class="section-head"><h3>AI 修正順位</h3><span class="small">本週</span></div>
+    <div class="priority"><span class="priority-no">1</span><div><b>預瞄</b><small>54 → 70 目標</small></div><span class="priority-score">HIGH</span></div>
+    <div class="priority"><span class="priority-no">2</span><div><b>決策</b><small>61 → 72 目標</small></div><span class="priority-score">HIGH</span></div>
+    <div class="priority"><span class="priority-no">3</span><div><b>技能配合</b><small>58 → 65 目標</small></div><span class="priority-score">MID</span></div>
+  </div>
+</div>
+
+<div class="section card">
+  <div class="section-head"><h3>最近活動</h3><button class="icon-btn" onclick="show('history',document.querySelectorAll('.nav button')[5])">查看全部</button></div>
+  <div class="task"><div class="task-icon">🎥</div><div class="task-main"><b>影片復盤完成</b><div class="task-meta">AI 找到 3 個高頻問題 · 預瞄為第一優先</div></div><span class="tag">UPDATED</span></div>
+  <div class="task"><div class="task-icon">🎯</div><div class="task-main"><b>Aimlabs Precision</b><div class="task-meta">完成 10 分鐘 · 準確率 91%</div></div><span class="tag">DONE</span></div>
+</div>
+</section>
+
+
+<section id="training" class="view">
+<div class="top"><div><h1>今日訓練</h1><div class="sub">不是固定課表。每一項都是由你的最新資料算出來的。</div></div><span class="badge">35 MIN</span></div>
+<div class="card">
+  <div class="section-head"><h3>今日任務</h3><span class="muted">4 個項目</span></div>
+  <div class="task"><div class="task-icon">🎯</div><div class="task-main"><b>Aimlabs · Precision / Micro Adjustment</b><div class="task-meta">10 分鐘 · 目標 91%+ accuracy · 速度不是重點</div></div><span class="pill">AIMLABS</span><button class="icon-btn" onclick="completeTask(this)">開始</button></div>
+  <div class="task"><div class="task-icon">🧭</div><div class="task-main"><b>VALORANT · 預瞄路線</b><div class="task-meta">8 分鐘 · 固定地圖 · 只看頭線與第一個可能角度</div></div><span class="pill">VAL</span><button class="icon-btn" onclick="completeTask(this)">開始</button></div>
+  <div class="task"><div class="task-icon">🧠</div><div class="task-main"><b>VALORANT · Decision DM</b><div class="task-meta">1 場 · 每次 peek 前回答：我得到什麼？失敗代價？</div></div><span class="pill">LIVE</span><button class="icon-btn" onclick="completeTask(this)">開始</button></div>
+  <div class="task"><div class="task-icon">📺</div><div class="task-main"><b>上傳完整對局</b><div class="task-meta">建議 30–90 分鐘 · 用來更新明日訓練權重</div></div><span class="pill">AI</span><button class="icon-btn" onclick="show('review',document.querySelectorAll('.nav button')[2])">上傳</button></div>
+</div>
+<div class="card section"><h3>為什麼是這些？</h3><p class="muted" style="line-height:1.8">AI 發現你的純 Flick 已經不是瓶頸，因此降低速度訓練；預瞄與決策反覆出現在對戰與影片中，所以今天把訓練時間移過去。完成後，明天會重新計算。</p></div>
+</section>
+
+<section id="account" class="view">
+<div class="top"><div><h1>Riot 帳號</h1><div class="sub">正式版會在這裡使用 Riot Sign On，讓你主動授權 MYTHIC COACH 讀取自己的資料。</div></div></div>
+<div class="login-panel">
+  <div class="riot-box">
+    <div class="riot-mark">RIOT <span style="color:var(--red)">×</span> MYTHIC COACH</div>
+    <h2>連結你的 VALORANT 帳號</h2>
+    <p class="muted" style="line-height:1.8">目前原型模式尚未接 Production RSO，因此按鈕只展示完整登入流程。正式版不會要求你把 Riot 密碼交給 MYTHIC COACH。</p>
+    <button class="btn" onclick="toast('原型模式：等待 Riot Production RSO 核准後啟用')">使用 Riot 登入</button>
+    <div class="flow"><div><b>01</b>Riot Login</div><div><b>02</b>玩家授權</div><div><b>03</b>取得身分</div><div><b>04</b>分析你的資料</div></div>
+    <div class="alert">安全原則：API Secret 只放後端；前端永遠不保存 Riot 密碼或 Secret。</div>
+  </div>
+</div>
+</section>
+
+<section id="settings" class="view">
+<div class="top"><div><h1>教練設定</h1><div class="sub">決定 AI 怎麼安排你的訓練。</div></div></div>
+<div class="card">
+  <div class="settings-row"><div><b>每日訓練上限</b><div class="small">AI 不會超過這個時間</div></div><select style="background:#0a0f17;color:#fff;border:1px solid var(--line);border-radius:9px;padding:8px"><option>30 分鐘</option><option selected>45 分鐘</option><option>60 分鐘</option></select></div>
+  <div class="settings-row"><div><b>優先修正實戰問題</b><div class="small">讓影片問題權重高於純 Aim 分數</div></div><div class="toggle on" onclick="this.classList.toggle('on')"><i></i></div></div>
+  <div class="settings-row"><div><b>高頻問題保護</b><div class="small">同一問題連續改善前，不增加新項目</div></div><div class="toggle on" onclick="this.classList.toggle('on')"><i></i></div></div>
+  <div class="settings-row"><div><b>訓練難度</b><div class="small">依完成率自動升級</div></div><select style="background:#0a0f17;color:#fff;border:1px solid var(--line);border-radius:9px;padding:8px"><option selected>自動</option><option>保守</option><option>激進</option></select></div>
+</div>
+</section>
+<section id="review" class="view">
+<div class="top">
+  <div><h1>AI 全面影片復盤</h1>
+  <div class="sub">不是只找「你槍法哪裡不好」，而是把每個回合拆開，從機械操作到決策與陣容逐層檢查。</div></div>
+  <span class="badge">MULTI-LAYER ANALYSIS</span>
+</div>
+
+<div class="card upload">
+  <div style="font-size:38px">🎥</div>
+  <h2>上傳完整對局</h2>
+  <p class="muted">建議 30–90 分鐘。完整影片能讓 AI 分辨「偶發失誤」和「一直重複的習慣」。</p>
+  <label class="btn" for="video">選擇影片</label>
+  <input id="video" type="file" accept="video/*" onchange="startAnalysis(this)">
+  <div id="fileName" class="small" style="margin-top:12px"></div>
+</div>
+
+<div id="analysis" class="card analysis-box" style="margin-top:16px">
+  <div class="section-head">
+    <div><h3>AI 長片段深度掃描</h3><div class="small">逐回合建立事件 → 多維度評估 → 找出重複模式 → 生成訓練處方</div></div>
+    <span id="pct" class="muted">0%</span>
+  </div>
+  <div class="progress"><i id="scanbar" style="width:0%"></i></div>
+  <p id="scantext" class="muted">建立影片索引…</p>
+
+  <div id="results" style="display:none">
+    <div class="section card" style="margin-top:18px">
+      <div class="section-head">
+        <h3>🎯 AI 教練總結</h3><span class="pill">本場最重要</span>
+      </div>
+      <div class="alert" style="border-left-color:var(--red)">
+        <b>第一優先：決策速度與預瞄</b><br>
+        你的純瞄準能力不是最大瓶頸。影片中多次出現「知道要打，但交火前準星沒有先放到最可能出現的位置」，
+        導致你需要在看到敵人後才做大幅修正。這比單純增加 Flick 訓練更值得先修。
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:14px">
+        <div><span class="small">最需要改善</span><h3>預瞄 / 站位</h3><span class="tag">HIGH</span></div>
+        <div><span class="small">第二優先</span><h3>決策 / 交火選擇</h3><span class="tag">HIGH</span></div>
+        <div><span class="small">維持即可</span><h3>純瞄準</h3><span class="tag">STABLE</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h3>八大分析層面</h3><span class="muted">AI 不是只看 K/D</span></div>
+      <div class="grid">
+        <div class="card"><div class="kicker">01 · AIM</div><h3>瞄準與槍法</h3>
+          <div class="barline"><span>第一槍</span><div class="bar"><i style="width:82%"></i></div><b>82</b></div>
+          <div class="barline"><span>微調</span><div class="bar"><i style="width:64%"></i></div><b>64</b></div>
+          <div class="barline"><span>追蹤</span><div class="bar"><i style="width:71%"></i></div><b>71</b></div>
+          <p class="small">問題：看到敵人後的第二次修正幅度偏大。</p>
+        </div>
+
+        <div class="card"><div class="kicker">02 · CROSSHAIR</div><h3>預瞄與準星路徑</h3>
+          <div class="barline"><span>頭線</span><div class="bar"><i style="width:57%"></i></div><b>57</b></div>
+          <div class="barline"><span>角度</span><div class="bar"><i style="width:61%"></i></div><b>61</b></div>
+          <p class="small">問題：轉角前沒有把準星放到最可能的敵人位置。</p>
+        </div>
+
+        <div class="card"><div class="kicker">03 · STRATEGY</div><h3>策略與回合計畫</h3>
+          <div class="barline"><span>目標</span><div class="bar"><i style="width:63%"></i></div><b>63</b></div>
+          <div class="barline"><span>轉換</span><div class="bar"><i style="width:55%"></i></div><b>55</b></div>
+          <p class="small">問題：取得人數優勢後仍有幾次主動找不必要的交火。</p>
+        </div>
+
+        <div class="card"><div class="kicker">04 · DECISION</div><h3>想法與決策</h3>
+          <div class="barline"><span>風險</span><div class="bar"><i style="width:52%"></i></div><b>52</b></div>
+          <div class="barline"><span>資訊</span><div class="bar"><i style="width:69%"></i></div><b>69</b></div>
+          <p class="small">問題：資訊不足時有幾次過早做出不可逆決策。</p>
+        </div>
+
+        <div class="card"><div class="kicker">05 · COMPOSITION</div><h3>陣容與技能協同</h3>
+          <div class="barline"><span>技能</span><div class="bar"><i style="width:74%"></i></div><b>74</b></div>
+          <div class="barline"><span>配合</span><div class="bar"><i style="width:58%"></i></div><b>58</b></div>
+          <p class="small">問題：有技能可配合時，部分回合沒有把技能轉成可控交火。</p>
+        </div>
+
+        <div class="card"><div class="kicker">06 · POSITION</div><h3>站位與地圖理解</h3>
+          <div class="barline"><span>站位</span><div class="bar"><i style="width:60%"></i></div><b>60</b></div>
+          <div class="barline"><span>撤退</span><div class="bar"><i style="width:48%"></i></div><b>48</b></div>
+          <p class="small">問題：有幾次擊殺後停留位置讓下一個敵人容易預判。</p>
+        </div>
+
+        <div class="card"><div class="kicker">07 · ECONOMY</div><h3>經濟與回合管理</h3>
+          <div class="barline"><span>資源</span><div class="bar"><i style="width:77%"></i></div><b>77</b></div>
+          <div class="barline"><span>節奏</span><div class="bar"><i style="width:66%"></i></div><b>66</b></div>
+          <p class="small">整體穩定，沒有列為主要訓練項。</p>
+        </div>
+
+        <div class="card"><div class="kicker">08 · CLUTCH</div><h3>關鍵回合與抗壓</h3>
+          <div class="barline"><span>1vX</span><div class="bar"><i style="width:73%"></i></div><b>73</b></div>
+          <div class="barline"><span>收尾</span><div class="bar"><i style="width:51%"></i></div><b>51</b></div>
+          <p class="small">問題：優勢局收尾時節奏容易突然加快。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section card">
+      <div class="section-head"><h3>🧠 逐回合「為什麼」分析</h3><span class="muted">示意事件</span></div>
+      <div class="task"><div class="task-icon">01</div><div class="task-main"><div class="task-title">你在交火前已經輸掉了一部分優勢</div><div class="task-meta">02:14 · 預瞄偏低 → 看到敵人後大幅拉準星 → 第一發失去先手</div></div><span class="tag">預瞄</span></div>
+      <div class="task"><div class="task-icon">02</div><div class="task-main"><div class="task-title">這個 peek 沒有足夠資訊支撐</div><div class="task-meta">08:37 · 隊伍已有人數優勢 → 仍主動找第二個交火 → 優勢被交換掉</div></div><span class="tag">決策</span></div>
+      <div class="task"><div class="task-icon">03</div><div class="task-main"><div class="task-title">技能有價值，但使用時機沒有形成隊伍優勢</div><div class="task-meta">21:05 · 技能先交 → 沒有同步跟進 → 敵方仍能安全撤回</div></div><span class="tag">陣容</span></div>
+    </div>
+
+    <div class="section card">
+      <div class="section-head"><h3>🏋️ 對症下藥：下一步怎麼練</h3><span class="pill">自動生成</span></div>
+      <div class="task"><div class="task-icon">🎯</div><div class="task-main"><div class="task-title">Aimlabs：精準微調</div><div class="task-meta">8–10 分鐘 · 降低速度要求 · 只記「第一發後最小修正」</div></div><b>修瞄準</b></div>
+      <div class="task"><div class="task-icon">🧱</div><div class="task-main"><div class="task-title">VALORANT：預瞄路線訓練</div><div class="task-meta">10 分鐘 · 固定一張地圖 · 每個常見角落先把準星放到預期敵人位置</div></div><b>修預瞄</b></div>
+      <div class="task"><div class="task-icon">🧠</div><div class="task-main"><div class="task-title">實戰：資訊決策規則</div><div class="task-meta">1–2 場 · 每次想 peek 前先問「我得到什麼資訊？失敗代價是什麼？」</div></div><b>修決策</b></div>
+      <div class="task"><div class="task-icon">🤝</div><div class="task-main"><div class="task-title">陣容協同練習</div><div class="task-meta">下一場只選一個技能 combo 練習，不增加整體操作負擔</div></div><b>修配合</b></div>
+    </div>
+
+    <div class="section card">
+      <div class="section-head"><h3>📌 明天的 AI 課表會怎麼變</h3><span class="muted">根據本次復盤</span></div>
+      <p style="line-height:1.8;color:#bdc7d5">預瞄權重 ↑、決策訓練 ↑、純 Flick ↓。如果下一場影片證明預瞄已改善，AI 才會把訓練量轉回 Micro Adjustment；如果決策問題仍反覆出現，則維持低量瞄準、增加回合思考與復盤。</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="stats" class="view">
+<div class="top"><div><h1>個人競技檔案</h1><div class="sub">把 Riot 對戰資料、訓練結果與影片觀察合在同一張能力地圖。</div></div><button class="btn alt" onclick="show('account',document.querySelectorAll('.nav button')[6])">管理 Riot 連結</button></div>
+<div class="metric-grid">
+<div class="metric"><div class="small">目前段位</div><div class="num">Ascendant</div><div class="delta">目標 Mythic</div></div>
+<div class="metric"><div class="small">最近 20 場勝率</div><div class="num">58%</div><div class="delta">+4%</div></div>
+<div class="metric"><div class="small">K/D</div><div class="num">1.21</div><div class="delta">+0.08</div></div>
+<div class="metric"><div class="small">AI 資料信心</div><div class="num">91%</div><div class="delta">資料足夠</div></div>
+</div>
+<div class="card section"><div class="section-head"><h3>能力分解</h3><div class="filter"><button class="on">全部</button><button>瞄準</button><button>決策</button><button>團隊</button></div></div>
+<div class="barline"><span>第一槍</span><div class="bar"><i style="width:82%"></i></div><b>82</b></div>
+<div class="barline"><span>Micro</span><div class="bar"><i style="width:64%"></i></div><b>64</b></div>
+<div class="barline"><span>預瞄</span><div class="bar"><i style="width:54%"></i></div><b>54</b></div>
+<div class="barline"><span>策略</span><div class="bar"><i style="width:63%"></i></div><b>63</b></div>
+<div class="barline"><span>決策</span><div class="bar"><i style="width:61%"></i></div><b>61</b></div>
+<div class="barline"><span>配合</span><div class="bar"><i style="width:58%"></i></div><b>58</b></div>
+</div>
+<div class="card section"><h3>最近對戰</h3>
+<table class="table"><tr><th>地圖</th><th>結果</th><th>K/D</th><th>AI 評價</th></tr>
+<tr><td>Ascent</td><td style="color:var(--green)">勝</td><td>19/14</td><td>預瞄 ★★★</td></tr>
+<tr><td>Haven</td><td style="color:var(--red)">敗</td><td>16/19</td><td>決策 ★★</td></tr>
+<tr><td>Lotus</td><td style="color:var(--green)">勝</td><td>22/17</td><td>站位 ★★★★</td></tr>
+<tr><td>Bind</td><td style="color:var(--green)">勝</td><td>21/15</td><td>第一槍 ★★★★</td></tr>
+</table></div>
+</section>
+
+<section id="history" class="view">
+<div class="top"><div><h1>成長紀錄</h1><div class="sub">不是只看分數，而是看「問題有沒有真的消失」。</div></div></div>
+<div class="card"><h3>最近 6 天</h3>
+<div class="barline"><span>週一</span><div class="bar"><i style="width:45%"></i></div><b>45</b></div>
+<div class="barline"><span>週二</span><div class="bar"><i style="width:53%"></i></div><b>53</b></div>
+<div class="barline"><span>週三</span><div class="bar"><i style="width:59%"></i></div><b>59</b></div>
+<div class="barline"><span>週四</span><div class="bar"><i style="width:62%"></i></div><b>62</b></div>
+<div class="barline"><span>週五</span><div class="bar"><i style="width:68%"></i></div><b>68</b></div>
+<div class="barline"><span>今天</span><div class="bar"><i style="width:72%"></i></div><b>72</b></div>
+</div>
+</section>
+</main>
+</div>
+<script>
+function show(id,btn){
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+ if(btn) btn.classList.add('active');
+}
+function startAnalysis(input){
+ const file=input.files[0]; if(!file)return;
+ document.getElementById('fileName').textContent='已選擇：'+file.name+' · '+(file.size/1024/1024).toFixed(1)+' MB';
+ const box=document.getElementById('analysis'); box.classList.add('show');
+ document.getElementById('results').style.display='none';
+ let p=0;
+ const texts=['建立影片索引…','逐回合分析交火、準星與站位…','分析策略、資訊與決策…','分析陣容、技能協同與回合資源…','合併重複問題並排序優先級…','生成明日訓練處方…','完成。'];
+ const timer=setInterval(()=>{
+   p+=1; if(p>100)p=100;
+   document.getElementById('pct').textContent=p+'%';
+   document.getElementById('scanbar').style.width=p+'%';
+   document.getElementById('scantext').textContent=texts[Math.min(texts.length-1,Math.floor(p/16.7))];
+   if(p===100){
+     clearInterval(timer);
+     document.getElementById('results').style.display='block';
+   }
+ },45);
+}
+
+function toast(msg){
+ const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+ clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.style.display='none',2600);
+}
+function completeTask(btn){
+ btn.textContent='✓ 完成';btn.disabled=true;btn.style.color='var(--green)';
+ toast('訓練已記錄，AI 將把結果加入下一次課表計算');
+}
+</script>
+<div id="toast" class="toast"></div></body>
+</html>
